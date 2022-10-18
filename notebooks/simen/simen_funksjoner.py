@@ -33,12 +33,19 @@ def mean_income_per_capita(dataset_age,dataset_income):
     return mean_income
 
 def mean_income_per_capita_grouped(dataset_income,dataset_geography,grouping_element):
+    #gets data from mean_income_per_capita functino
     data_mean_income = mean_income_per_capita(data_age,dataset_income)
+    #gets data from geography set and makes sure we only use data for 2016
     geography_df = dataset_geography[dataset_geography["year"] == 2016]
+    #gets the data of mean income with the geography data
     mean_income_geo_df = data_mean_income.merge(geography_df, how='left', on='grunnkrets_id')
+    #sum the number of people based on grouping element
     grouped_population_df=mean_income_geo_df.groupby([grouping_element], as_index = False)["population_count"].sum()
-    grouped_income_df=mean_income_geo_df.groupby([grouping_element], as_index = False)["mean_income"].mean()
-    mean_income_geo_df=grouped_income_df.merge(grouped_population_df, how='left', on=grouping_element)
-    mean_income_geo_df['mean_income']=mean_income_geo_df['mean_income']/mean_income_geo_df['population_count']
-    finished_mean = mean_income_geo_df.drop(['population_count'],axis=1)
-    return finished_mean
+    #merge this with the grunnkrets to see both total population per selected area and grunnkrets
+    total_grouped_df=mean_income_geo_df.merge(grouped_population_df,how='left',on=grouping_element)
+    portion_income_df=total_grouped_df
+    #find ration of grunnkrets to total population and multiply this with grunnkrets mean income
+    portion_income_df['mean_income']=total_grouped_df['mean_income']*total_grouped_df['population_count_x']/total_grouped_df['population_count_y']
+    #add these incomes together, should add up to the total mean income for the selected area
+    grouped_income_df=portion_income_df.groupby([grouping_element], as_index = False)["mean_income"].sum() 
+    return grouped_income_df
