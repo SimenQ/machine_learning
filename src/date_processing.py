@@ -290,9 +290,9 @@ def mean_income_per_capita(dataset_age, dataset_income):
     return mean_income
 
 
-def mean_income_per_capita_grouped(dataset_income, dataset_geography, grouping_element):
+def mean_income_per_capita_grouped(dataset_age, dataset_income, dataset_geography, grouping_element):
     # gets data from mean_income_per_capita functino
-    data_mean_income = mean_income_per_capita(data_age, dataset_income)
+    data_mean_income = mean_income_per_capita(dataset_age, dataset_income)
     # gets data from geography set and makes sure we only use data for 2016
     geography_df = dataset_geography[dataset_geography["year"] == 2016]
     # gets the data of mean income with the geography data
