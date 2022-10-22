@@ -203,9 +203,6 @@ def population_per_store(age_df, geo_df, stores_df, grouping_element):
 # This function groups the age distrubution (0-90) into 7 buckets with and returns a table which represents the presentages each of these
 # buckets corresponds to compared with the total amount of people living in the given geographic region
 
-# This function groups the age distrubution (0-90) into 7 buckets with and returns a table which represents the presentages each of these
-# buckets corresponds to compared with the total amount of people living in the given geographic region
-
 
 def age_distrubution(grunnkrets_age_df, geographic_df, grouping_element):
     age_df = grunnkrets_age_df[grunnkrets_age_df["year"] == 2016]
@@ -293,9 +290,9 @@ def mean_income_per_capita(dataset_age, dataset_income):
     return mean_income
 
 
-def mean_income_per_capita_grouped(dataset_age, dataset_income, dataset_geography, grouping_element):
+def mean_income_per_capita_grouped(dataset_income, dataset_geography, grouping_element):
     # gets data from mean_income_per_capita functino
-    data_mean_income = mean_income_per_capita(dataset_age, dataset_income)
+    data_mean_income = mean_income_per_capita(data_age, dataset_income)
     # gets data from geography set and makes sure we only use data for 2016
     geography_df = dataset_geography[dataset_geography["year"] == 2016]
     # gets the data of mean income with the geography data
