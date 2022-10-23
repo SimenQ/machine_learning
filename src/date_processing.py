@@ -184,66 +184,57 @@ def is_chain(stores_df):
     return df[["store_id", "chain_name", "is_chain"]]
 
 # This function calculates the population count per number of stores in a geographic region
-
-
 def population_per_store(age_df, geo_df, stores_df, grouping_element):
     new_geo_df = geo_df[geo_df["year"] == 2016]
     pop_gk = population(age_df)
     pop_df = population_grouped(age_df, geo_df, grouping_element)
-    combined_df = pop_gk.merge(stores_df, how="left", on="grunnkrets_id").merge(
-        new_geo_df, how="left", on="grunnkrets_id")
-    grouped_df = combined_df.groupby([grouping_element], as_index=False)[
-        "store_id"].count()
-    pop_per_store_df = grouped_df.merge(
-        pop_df, how="inner", on=grouping_element)
-    pop_per_store_df["population_per_num_stores"] = pop_per_store_df["population_count"] / \
-        pop_per_store_df["store_id"]
+    combined_df = pop_gk.merge(stores_df, how = "left", on = "grunnkrets_id").merge(new_geo_df, how = "left", on = "grunnkrets_id")
+    grouped_df = combined_df.groupby([grouping_element], as_index = False)["store_id"].count()
+    pop_per_store_df = grouped_df.merge(pop_df, how = "inner", on = grouping_element)
+    pop_per_store_df["population_per_num_stores"] = pop_per_store_df["population_count"] / pop_per_store_df["store_id"]
+    pop_per_store_df.rename(columns = {"store_id": "num_stores"}, inplace = True)
     return pop_per_store_df
 
-# This function groups the age distrubution (0-90) into 7 buckets with and returns a table which represents the presentages each of these
-# buckets corresponds to compared with the total amount of people living in the given geographic region
-
-
-def age_distrubution(grunnkrets_age_df, geographic_df, grouping_element):
+#This function groups the age distrubution (0-90) into 7 buckets with and returns a table which represents the presentages each of these 
+# buckets corresponds to compared with the total amount of people living in the given geographic region s
+def age_distrubution(grunnkrets_age_df, geographic_df, grouping_element): 
     age_df = grunnkrets_age_df[grunnkrets_age_df["year"] == 2016]
-    age_df1 = age_df.drop(["year"], axis=1)
-    age_df1["kids"] = age_df1.iloc[:, 1:8].sum(axis=1)
-    age_df1["kids+"] = age_df1.iloc[:, 8:14].sum(axis=1)
-    age_df1["youths"] = age_df1.iloc[:, 14: 19].sum(axis=1)
-    age_df1["youthAdult"] = age_df1.iloc[:, 19:27].sum(axis=1)
-    age_df1["adult"] = age_df1.iloc[:, 27:37].sum(axis=1)
-    age_df1["adults+"] = age_df1.iloc[:, 37:62].sum(axis=1)
-    age_df1["pensinors"] = age_df1.iloc[:, 62:92].sum(axis=1)
+    age_df1 = age_df.drop(["year"], axis = 1)
+    age_df1["num_kids"] = age_df1.iloc[:, 1:8].sum(axis=1)   
+    age_df1["num_kids+"] = age_df1.iloc[:, 8:14].sum(axis=1)
+    age_df1["num_youths"] = age_df1.iloc[:, 14: 19].sum(axis=1)
+    age_df1["num_youthAdult"] = age_df1.iloc[:, 19:27].sum(axis=1)
+    age_df1["num_adult"] = age_df1.iloc[:, 27:37].sum(axis=1)
+    age_df1["num_adults+"] = age_df1.iloc[:, 37:62].sum(axis=1)
+    age_df1["num_pensinors"] = age_df1.iloc[:, 62:92].sum(axis=1)
 
-    age_df2 = age_df1[["grunnkrets_id", "kids", "kids+",
-                       "youths", "youthAdult", "adult", "adults+", "pensinors"]]
+    age_df2 = age_df1[["grunnkrets_id", "num_kids", "num_kids+", "num_youths", "num_youthAdult", "num_adult", "num_adults+", "num_pensinors"]]
 
     pop_df = population(grunnkrets_age_df)
     geo_df = geographic_df[geographic_df["year"] == 2016]
-    new_geo_df = geo_df.drop(["geometry", "area_km2", "year"], axis=1)
-    combined_df = age_df2.merge(pop_df, how="inner", on="grunnkrets_id").merge(
-        new_geo_df, how="inner", on="grunnkrets_id")
-    list_columns = ["kids", "kids+", "youths",
-                    "youthAdult", "adult", "adults+", "pensinors"]
-    combined_df2 = combined_df.groupby([grouping_element], as_index=False)[
-        list_columns].sum()
+    new_geo_df = geo_df.drop(["geometry", "area_km2", "year"], axis = 1)
+    combined_df = age_df2.merge(pop_df, how="inner", on = "grunnkrets_id").merge(new_geo_df, how = "inner", on = "grunnkrets_id")
+    list_columns = ["num_kids", "num_kids+", "num_youths", "num_youthAdult", "num_adult", "num_adults+", "num_pensinors"]
+    combined_df2 = combined_df.groupby([grouping_element], as_index=False)[list_columns].sum()
 
-    pop_gk = population_grouped(
-        grunnkrets_age_df, geographic_df, grouping_element)
-    new_df = combined_df2.merge(pop_gk, how="inner", on=grouping_element)
+    pop_gk = population_grouped(grunnkrets_age_df, geographic_df, grouping_element)
+    new_df = combined_df2.merge(pop_gk, how = "inner", on = grouping_element)
 
-    new_df["kids_%"] = new_df["kids"] / new_df["population_count"]
-    new_df["kids+_%"] = new_df["kids+"] / new_df["population_count"]
-    new_df["youths_%"] = new_df["youths"] / new_df["population_count"]
-    new_df["youthAdult_%"] = new_df["youthAdult"] / new_df["population_count"]
-    new_df["adult_%"] = new_df["adult"] / new_df["population_count"]
-    new_df["adults+_%"] = new_df["adults+"] / new_df["population_count"]
-    new_df["pensinors_%"] = new_df["pensinors"] / new_df["population_count"]
+    new_df["kids_%"] = new_df["num_kids"] / new_df["population_count"]
+    new_df["kids+_%"] = new_df["num_kids+"] / new_df["population_count"]
+    new_df["youths_%"] = new_df["num_youths"] / new_df["population_count"]
+    new_df["youthAdult_%"] = new_df["num_youthAdult"] / new_df["population_count"]
+    new_df["adult_%"] = new_df["num_adult"] / new_df["population_count"]
+    new_df["adults+_%"] = new_df["num_adults+"] / new_df["population_count"]
+    new_df["pensinors_%"] = new_df["num_pensinors"] / new_df["population_count"]
 
-    if (grouping_element == "grunnkrets_id"):
-        return new_df[["grunnkrets_id", "kids_%", "kids+_%", "youths_%", "youthAdult_%", "adult_%", "adults+_%", "pensinors_%"]]
-    else:
-        return new_df[[grouping_element, "kids_%", "kids+_%", "youths_%", "youthAdult_%", "adult_%", "adults+_%", "pensinors_%"]]
+    age_dist_df = new_df.drop(["population_count"], axis = 1)
+    #if (grouping_element == "grunnkrets_id"): 
+        #return new_df[["grunnkrets_id", "kids_%", "kids+_%", "youths_%", "youthAdult_%", "adult_%", "adults+_%", "pensinors_%" ]]
+    #else: 
+        #return new_df[[grouping_element, "kids_%", "kids+_%", "youths_%", "youthAdult_%", "adult_%", "adults+_%", "pensinors_%" ]]
+
+    return age_dist_df
 
 # This function calculates the total amount of household types based on a geographic area
 
