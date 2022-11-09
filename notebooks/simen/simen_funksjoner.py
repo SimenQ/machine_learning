@@ -1,3 +1,7 @@
+from shapely.geometry import Point
+import pandas as pd
+stores_train = pd.read_csv('../../data/raw/stores_train.csv')
+
 def average_revenue_of_chain(dataset_stores):
     "Average revenue of chains in datasett"
     dataset_stores = dataset_stores[(dataset_stores["year"] == 2016)]
@@ -63,3 +67,13 @@ def mean_income_per_capita_grouped(dataset_age, dataset_income, dataset_geograph
     grouped_income_df = portion_income_df.groupby(
         [grouping_element], as_index=False)["mean_income"].sum()
     return grouped_income_df
+
+def make_point(stores_train):
+    stores_train_new = stores_train.copy()
+    stores_train_new['point'] = [Point(xy) for xy in zip(stores_train.lon, stores_train.lat)] 
+    stores_train_new_finished = stores_train_new[['store_id','point']]
+    return stores_train_new_finished
+    
+
+
+
