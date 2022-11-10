@@ -1,5 +1,11 @@
 from shapely.geometry import Point
 import pandas as pd
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import PowerTransformer
+from sklearn.compose import make_column_transformer
+from sklearn.impute import SimpleImputer
+
+
 stores_train = pd.read_csv('../../data/raw/stores_train.csv')
 
 def average_revenue_of_chain(dataset_stores):
@@ -75,5 +81,14 @@ def make_point(stores_train):
     return stores_train_new_finished
     
 
+
+yeo_pipeline = make_pipeline(
+    SimpleImputer(strategy="mean"),
+    PowerTransformer()
+)
+
+preprocessing = make_column_transformer(
+    (yeo_pipeline, ['revenue', 'lat', 'lon'])
+)
 
 
