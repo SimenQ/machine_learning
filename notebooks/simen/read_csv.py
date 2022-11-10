@@ -13,6 +13,7 @@ from read_csv import *
 from sklearn.preprocessing import PowerTransformer
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import RobustScaler
+from sklearn.decomposition import PCA
 
 #importing stores_train
 stores_train = pd.read_csv('/Users/simenvoldqvam/Desktop/Skole/machine_learning/data/raw/stores_train.csv')
