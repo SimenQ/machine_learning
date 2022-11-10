@@ -10,6 +10,9 @@ from h2o.automl import H2OAutoML
 from shapely.geometry import Point
 from simen_funksjoner import *
 from read_csv import *
+from sklearn.preprocessing import PowerTransformer
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import RobustScaler
 
 #importing stores_train
 stores_train = pd.read_csv('/Users/simenvoldqvam/Desktop/Skole/machine_learning/data/raw/stores_train.csv')
